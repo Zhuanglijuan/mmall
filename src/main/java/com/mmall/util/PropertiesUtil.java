@@ -8,12 +8,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
+/**
+ * 读取配置文件工具类
+ */
 public class PropertiesUtil {
 
     private static Logger logger = LoggerFactory.getLogger(PropertiesUtil.class);
 
     private static Properties props;
 
+    //使用静态代码块,tomcat启动时读取配置
     static {
         String fileName = "mmall.properties";
         props = new Properties();
@@ -34,6 +38,7 @@ public class PropertiesUtil {
 
     public static String getProperty(String key,String defaultValue){
 
+        //如果value为空,将传来的defaultValue返回
         String value = props.getProperty(key.trim());
         if(StringUtils.isBlank(value)){
             value = defaultValue;
