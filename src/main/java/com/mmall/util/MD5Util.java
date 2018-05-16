@@ -4,9 +4,6 @@ import org.springframework.util.StringUtils;
 
 import java.security.MessageDigest;
 
-/**
- * Created by geely
- */
 public class MD5Util {
 
     private static String byteArrayToHexString(byte b[]) {
@@ -29,8 +26,8 @@ public class MD5Util {
     /**
      * 返回大写MD5
      *
-     * @param origin
-     * @param charsetname
+     * @param origin    :原字符串
+     * @param charsetname   :加密算法的字符集
      * @return
      */
     private static String MD5Encode(String origin, String charsetname) {
@@ -44,6 +41,7 @@ public class MD5Util {
                 resultString = byteArrayToHexString(md.digest(resultString.getBytes(charsetname)));
         } catch (Exception exception) {
         }
+        //全部返回成大写的md5
         return resultString.toUpperCase();
     }
 

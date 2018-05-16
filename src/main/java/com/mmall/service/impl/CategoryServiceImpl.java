@@ -27,15 +27,22 @@ public class CategoryServiceImpl implements ICategoryService {
     @Autowired
     private CategoryMapper categoryMapper;
 
+    /**
+     * 添加分类
+     * @param categoryName  :分类名称
+     * @param parentId      :父结点
+     * @return
+     */
     public ServerResponse addCategory(String categoryName, Integer parentId) {
+        //参数校验
         if (parentId == null || StringUtils.isBlank(categoryName)) {
             return ServerResponse.createByErrorMessage("添加品类参数错误");
         }
 
         Category category = new Category();
         category.setName(categoryName);
-        ;
         category.setParentId(parentId);
+        //这个分类可用
         category.setStatus(true);
 
         int rowCount = categoryMapper.insert(category);
@@ -46,6 +53,12 @@ public class CategoryServiceImpl implements ICategoryService {
         return ServerResponse.createByErrorMessage("添加品类失败");
     }
 
+    /**
+     * 更新分类名称
+     * @param categoryId    :分类id
+     * @param categoryName  :分类名字
+     * @return
+     */
     public ServerResponse updateCategoryName(Integer categoryId, String categoryName) {
         if (categoryId == null || StringUtils.isBlank(categoryName)) {
             return ServerResponse.createByErrorMessage("更新品类参数错误");
@@ -54,6 +67,7 @@ public class CategoryServiceImpl implements ICategoryService {
         category.setId(categoryId);
         category.setName(categoryName);
 
+        //通过主键选择性更新
         int rowCount = categoryMapper.updateByPrimaryKeySelective(category);
         if (rowCount > 0) {
             return ServerResponse.createBySuccess("更新品类名字成功");
@@ -62,9 +76,14 @@ public class CategoryServiceImpl implements ICategoryService {
         }
     }
 
+    /**
+     * 获取节点信息
+     * @param categoryId    :父结点分类id
+     * @return
+     */
     public ServerResponse<List<Category>> getChildrenParallelCategory(Integer categoryId) {
         List<Category> categoryList = categoryMapper.selectCategoryChildrenByParentId(categoryId);
-        if (CollectionUtils.isEmpty(categoryList)) {
+        if (CollectionUtils.isEmpty(categoryList)) {//空集合
             logger.info("未找到当前分类的子分类");
         }
         return ServerResponse.createBySuccess(categoryList);
@@ -74,18 +93,18 @@ public class CategoryServiceImpl implements ICategoryService {
 
     /**
      * 递归查询本节点的id及孩子节点的Id
-     * @param categoryId
+     * @param categoryId    :分类id
      * @return
      */
     public ServerResponse selectCategoryAndChildrenById(Integer categoryId) {
         Set<Category> categorySet = Sets.newHashSet();
-        findChildCategory(categorySet,categoryId);
+        findChildCategory(categorySet, categoryId);
 
         List<Integer> categoryIdList = Lists.newArrayList();
-        if(categoryId != null){
-           for(Category categoryItem : categorySet){
-               categoryIdList.add(categoryItem.getId());
-           }
+        if (categoryId != null) {
+            for (Category categoryItem : categorySet) {
+                categoryIdList.add(categoryItem.getId());
+            }
         }
 
         return ServerResponse.createBySuccess(categoryIdList);
@@ -99,13 +118,13 @@ public class CategoryServiceImpl implements ICategoryService {
             categorySet.add(category);
 
         //查找子结点，退出条件
+        //mybatis对于返回集合的处理:如果未找到不会返回null，所以不用判断防止空指针异常
         List<Category> categoryList = categoryMapper.selectCategoryChildrenByParentId(categoryId);
         for (Category categoryItem : categoryList) {
             findChildCategory(categorySet, categoryItem.getId());
         }
 
         return categorySet;
-
     }
 
 }

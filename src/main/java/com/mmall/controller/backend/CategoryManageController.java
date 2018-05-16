@@ -27,9 +27,17 @@ public class CategoryManageController {
     @Autowired
     private ICategoryService iCategoryService;
 
+    /**
+     * 添加分类
+     * @param session       :会话
+     * @param categoryName  :分类名字
+     * @param parentId      :父结点,默认为0,0为根节点
+     * @return
+     */
     @RequestMapping("add_category.do")
     @ResponseBody
     public ServerResponse addCategory(HttpSession session, String categoryName, @RequestParam(value = "parentId", defaultValue = "0") int parentId) {
+        //判断登陆状态
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录");
@@ -45,6 +53,13 @@ public class CategoryManageController {
         }
     }
 
+    /**
+     * 更新分类
+     * @param session       :会话
+     * @param categoryId    :分类ID
+     * @param categoryName  :分类名字
+     * @return
+     */
     @RequestMapping("set_category_name.do")
     @ResponseBody
     public ServerResponse setCategoryName(HttpSession session, Integer categoryId, String categoryName) {
@@ -61,9 +76,17 @@ public class CategoryManageController {
             return ServerResponse.createByErrorMessage("无权限操作，需要管理员权限");
         }
     }
+
+    /**
+     * 获取当前节点的子节点的分类信息
+     * 平级且不递归
+     * @param session       :会话
+     * @param categoryId    :分类id，默认为0，0为根节点
+     * @return
+     */
     @RequestMapping("get_category.do")
     @ResponseBody
-    public ServerResponse getChildrenParallelCategory(HttpSession session,@RequestParam(value = "categoryId" , defaultValue = "0") Integer categoryId){
+    public ServerResponse getChildrenParallelCategory(HttpSession session, @RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录");
@@ -77,9 +100,15 @@ public class CategoryManageController {
         }
     }
 
+    /**
+     * 递归查找子节点的分类信息
+     * @param session       :会话
+     * @param categoryId    :分类id，默认为0，0为根节点
+     * @return
+     */
     @RequestMapping("get_deep_category.do")
     @ResponseBody
-    public ServerResponse getCategoryAndDeepChildrenCategory(HttpSession session,@RequestParam(value = "categoryId" , defaultValue = "0") Integer categoryId){
+    public ServerResponse getCategoryAndDeepChildrenCategory(HttpSession session, @RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录");
@@ -92,5 +121,4 @@ public class CategoryManageController {
             return ServerResponse.createByErrorMessage("无权限操作，需要管理员权限");
         }
     }
-
 }

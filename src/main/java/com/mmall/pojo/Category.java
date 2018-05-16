@@ -88,6 +88,7 @@ public class Category {
         this.updateTime = updateTime;
     }
 
+    //重写equals和hashcode,保证判断因子相同,避免意想不到的问题
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -98,7 +99,6 @@ public class Category {
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(id);
+        return id != null ? id.hashCode() : 0;
     }
 }
