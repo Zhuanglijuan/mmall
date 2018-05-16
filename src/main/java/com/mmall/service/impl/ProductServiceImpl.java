@@ -1,5 +1,8 @@
 package com.mmall.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.dao.CategoryMapper;
@@ -10,9 +13,12 @@ import com.mmall.service.IProductService;
 import com.mmall.util.DateTimeUtil;
 import com.mmall.util.PropertiesUtil;
 import com.mmall.vo.ProductDetailVo;
+import com.mmall.vo.ProductListVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Created by Zhuang on 2018/5/16.
@@ -108,8 +114,8 @@ public class ProductServiceImpl implements IProductService {
 
     /**
      * 通过product把productDetailVo组装上
-     * @param product
-     * @return
+     * @param product   :产品对象
+     * @return  :返回ProductDetailVo对象
      */
     private ProductDetailVo assembleProductDetailVo(Product product){
         ProductDetailVo productDetailVo = new ProductDetailVo();
@@ -137,5 +143,76 @@ public class ProductServiceImpl implements IProductService {
         productDetailVo.setUpdateTime(DateTimeUtil.dateToStr(product.getUpdateTime()));
 
         return productDetailVo;
+    }
+
+    /**
+     * 获取商品列表
+     * @param pageNum   :页码
+     * @param pageSize  :页容量
+     * @return
+     */
+    public ServerResponse<PageInfo> getProductList(int pageNum,int pageSize){
+        //1. startPage4--start
+        //2. 填充自己sql查询逻辑
+        //3. pageHelper--收尾
+        PageHelper.startPage(pageNum,pageSize);
+        List<Product> productList = productMapper.selectList();
+        List<ProductListVo> productListVoList = Lists.newArrayList();
+        for(Product productItem : productList){
+            ProductListVo productListVo = assembleProductListVo(productItem);
+            productListVoList.add(productListVo);
+        }
+
+        /**
+         * 我们会用dao层找到原始的pojoList
+         * mybatispagehelper是原理是aop切面 动态增加分页参数，必须走一下dao层
+         * 因为pageHelper是对dao层在执行mapper的时候才会动态分页，所以我们要先执行一下mapper
+         * 所以必须和之前的dao层有请求才会添加分页相关信息
+         */
+        PageInfo pageResult = new PageInfo(productList);
+        pageResult.setList(productListVoList);
+        return ServerResponse.createBySuccess(pageResult);
+    }
+
+    /**
+     * 通过product把ProductListVo组装上
+     * @param product   :产品对象
+     * @return  :返回ProductListVo对象
+     */
+    private ProductListVo assembleProductListVo(Product product){
+        ProductListVo productListVo = new ProductListVo();
+        productListVo.setId(product.getId());
+        productListVo.setName(product.getName());
+        productListVo.setCategoryId(product.getCategoryId());
+        productListVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix","http://image.shopping.com/"));
+        productListVo.setMainImage(product.getMainImage());
+        productListVo.setPrice(product.getPrice());
+        productListVo.setSubtitle(product.getSubtitle());
+        productListVo.setStatus(product.getStatus());
+        return productListVo;
+    }
+
+    /**
+     * 产品搜索
+     * @param productName   :产品名称
+     * @param productId     :产品id
+     * @param pageNum       :页码
+     * @param pageSize      :页容量
+     * @return
+     */
+    public ServerResponse<PageInfo> searchProduct(String productName,Integer productId,int pageNum,int pageSize){
+        PageHelper.startPage(pageNum,pageSize);
+        if(StringUtils.isNotBlank(productName)){
+            productName = new StringBuffer().append("%").append(productName).append("%").toString();
+        }
+        List<Product> productList = productMapper.selectByNameAndProductId(productName,productId);
+        List<ProductListVo> productListVoList = Lists.newArrayList();
+        for(Product productItem : productList){
+            ProductListVo productListVo = assembleProductListVo(productItem);
+            productListVoList.add(productListVo);
+        }
+        PageInfo pageResult = new PageInfo(productList);
+        pageResult.setList(productListVoList);
+        return ServerResponse.createBySuccess(pageResult);
     }
 }
