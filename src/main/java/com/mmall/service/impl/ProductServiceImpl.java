@@ -39,6 +39,7 @@ public class ProductServiceImpl implements IProductService {
      * @param product   :产品
      * @return  :响应体
      */
+    @Override
     public ServerResponse saveOrUpdateProduct(Product product){
         if(product != null){
             //如果子图不为空
@@ -77,7 +78,8 @@ public class ProductServiceImpl implements IProductService {
      * @param status    :产品上下架状态
      * @return  :响应体
      */
-    public ServerResponse setSaleStatus(Integer productId,Integer status){
+    @Override
+    public ServerResponse setSaleStatus(Integer productId, Integer status){
         //判断传来的参数是否有效
         if(productId == null || status == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
@@ -101,6 +103,7 @@ public class ProductServiceImpl implements IProductService {
      * @param productId :商品id
      * @return
      */
+    @Override
     public ServerResponse<ProductDetailVo> manageProductDetail(Integer productId){
         if(productId == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
@@ -156,7 +159,8 @@ public class ProductServiceImpl implements IProductService {
      * @param pageSize  :页容量
      * @return
      */
-    public ServerResponse<PageInfo> getProductList(int pageNum,int pageSize){
+    @Override
+    public ServerResponse<PageInfo> getProductList(int pageNum, int pageSize){
         //1. startPage4--start
         //2. 填充自己sql查询逻辑
         //3. pageHelper--收尾
@@ -205,7 +209,8 @@ public class ProductServiceImpl implements IProductService {
      * @param pageSize      :页容量
      * @return
      */
-    public ServerResponse<PageInfo> searchProduct(String productName,Integer productId,int pageNum,int pageSize){
+    @Override
+    public ServerResponse<PageInfo> searchProduct(String productName, Integer productId, int pageNum, int pageSize){
         PageHelper.startPage(pageNum,pageSize);
         if(StringUtils.isNotBlank(productName)){
             productName = new StringBuffer().append("%").append(productName).append("%").toString();
@@ -226,6 +231,7 @@ public class ProductServiceImpl implements IProductService {
      * @param productId 商品id
      * @return
      */
+    @Override
     public ServerResponse<ProductDetailVo> getProductDetail(Integer productId){
         if(productId == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
@@ -252,7 +258,8 @@ public class ProductServiceImpl implements IProductService {
      * @param orderBy       :排序
      * @return
      */
-    public ServerResponse<PageInfo> getProductByKeywordCategory(String keyword,Integer categoryId,int pageNum,int pageSize,String orderBy){
+    @Override
+    public ServerResponse<PageInfo> getProductByKeywordCategory(String keyword, Integer categoryId, int pageNum, int pageSize, String orderBy){
         //参数校验
         if(StringUtils.isBlank(keyword) && categoryId == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());

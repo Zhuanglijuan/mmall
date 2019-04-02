@@ -228,4 +228,10 @@
     ORDER BY create_time DESC
   </select>
 
+  <select id="selectOrderCount" resultType="int">
+    select
+    count(*)
+    FROM mmall_order
+  </select>
+
 </mapper>

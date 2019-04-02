@@ -33,6 +33,7 @@ public class CategoryServiceImpl implements ICategoryService {
      * @param parentId      :父结点
      * @return
      */
+    @Override
     public ServerResponse addCategory(String categoryName, Integer parentId) {
         //参数校验
         if (parentId == null || StringUtils.isBlank(categoryName)) {
@@ -59,6 +60,7 @@ public class CategoryServiceImpl implements ICategoryService {
      * @param categoryName  :分类名字
      * @return
      */
+    @Override
     public ServerResponse updateCategoryName(Integer categoryId, String categoryName) {
         if (categoryId == null || StringUtils.isBlank(categoryName)) {
             return ServerResponse.createByErrorMessage("更新品类参数错误");
@@ -81,6 +83,7 @@ public class CategoryServiceImpl implements ICategoryService {
      * @param categoryId    :父结点分类id
      * @return
      */
+    @Override
     public ServerResponse<List<Category>> getChildrenParallelCategory(Integer categoryId) {
         List<Category> categoryList = categoryMapper.selectCategoryChildrenByParentId(categoryId);
         if (CollectionUtils.isEmpty(categoryList)) {//空集合
@@ -96,6 +99,7 @@ public class CategoryServiceImpl implements ICategoryService {
      * @param categoryId    :分类id
      * @return
      */
+    @Override
     public ServerResponse<List<Integer>> selectCategoryAndChildrenById(Integer categoryId) {
         Set<Category> categorySet = Sets.newHashSet();
         findChildCategory(categorySet, categoryId);

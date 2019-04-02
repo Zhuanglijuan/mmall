@@ -1,5 +1,7 @@
 package com.mmall.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.mmall.common.Const;
 import com.mmall.common.ServerResponse;
 import com.mmall.common.TokenCache;
@@ -11,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -61,6 +64,7 @@ public class UserServiceImpl implements IUserService {
      * @param user  :用户对象
      * @return
      */
+    @Override
     public ServerResponse<String> register(User user) {
         ServerResponse validResponse = this.checkValid(user.getUsername(), Const.USERNAME);
         //校验用户名是否存在
@@ -98,6 +102,7 @@ public class UserServiceImpl implements IUserService {
      * @param type  :email或username
      * @return
      */
+    @Override
     public ServerResponse<String> checkValid(String str, String type) {
         //StringUtils.isNotBlank(" ") = false
         if (StringUtils.isNotBlank(str) && StringUtils.isNotBlank(type)) {
@@ -126,6 +131,7 @@ public class UserServiceImpl implements IUserService {
      * @param username  :用户名
      * @return
      */
+    @Override
     public ServerResponse selectQuestion(String username) {
         ServerResponse validResponse = this.checkValid(username, Const.USERNAME);
         if (validResponse.isSuccess()) {
@@ -147,6 +153,7 @@ public class UserServiceImpl implements IUserService {
      * @param answer    :答案
      * @return
      */
+    @Override
     public ServerResponse<String> checkAnswer(String username, String question, String answer) {
         int resultCount = userMapper.checkAnswer(username, question, answer);
 
@@ -171,6 +178,7 @@ public class UserServiceImpl implements IUserService {
      * @param forgetToken   :令牌
      * @return
      */
+    @Override
     public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
         if (StringUtils.isBlank(forgetToken)) {
             return ServerResponse.createByErrorMessage("参数错误，token需要传递");
@@ -207,6 +215,7 @@ public class UserServiceImpl implements IUserService {
      * @param user          :当前用户对象
      * @return
      */
+    @Override
     public ServerResponse<String> resetPassword(String passwordOld, String passwordNew, User user) {
         //  防止横向越权，要检验一下这个用户的旧密码，一定要指定是这个用户,因为我们会查询到一个count(1)
         //  如果不指定Id,那么结果就是true count > 0，那么其他人不断试重置密码接口便可更改密码
@@ -230,6 +239,7 @@ public class UserServiceImpl implements IUserService {
      * @param user  :用户对象
      * @return
      */
+    @Override
     public ServerResponse<User> updateInormation(User user) {
         //username不能被更新
         //email也要校验，校验新的email是否已经存在，并且存在的email如果相同的话，不能是我们当前的这个用户的。
@@ -262,6 +272,7 @@ public class UserServiceImpl implements IUserService {
      * @param userId    :用户id即主键
      * @return
      */
+    @Override
     public ServerResponse<User> getInformation(Integer userId) {
         //通过主键查找
         User user = userMapper.selectByPrimaryKey(userId);
@@ -280,11 +291,26 @@ public class UserServiceImpl implements IUserService {
      * @param user
      * @return
      */
+    @Override
     public ServerResponse checkAdminRole(User user) {
         if (user != null && user.getRole().intValue() == Const.Role.ROLE_ADMIN) {
             return ServerResponse.createBySuccess();
         }
         return ServerResponse.createByError();
+    }
+
+    @Override
+    public ServerResponse<PageInfo> manageList(int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum,pageSize);
+        List<User> userList = userMapper.selectAllUser();
+        for (int i = 0; i < userList.size(); i++) {
+            User user = userList.get(i);
+            user.setEmail(user.getEmail().replaceAll("(\\w?)(\\w+)(\\w)(@\\w+\\.[a-z]+(\\.[a-z]+)?)", "$1****$3$4"));
+            user.setPhone(user.getPhone().replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2"));
+            userList.set(i,user);
+        }
+        PageInfo pageResult = new PageInfo(userList);
+        return ServerResponse.createBySuccess(pageResult);
     }
 }
 

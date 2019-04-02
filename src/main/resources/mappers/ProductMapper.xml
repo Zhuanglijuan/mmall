@@ -216,4 +216,11 @@
     </if>
   </select>
 
+  <select id="selectProductCount" resultType="int">
+    select
+    count(*)
+    from
+    mmall_product
+  </select>
+
 </mapper>

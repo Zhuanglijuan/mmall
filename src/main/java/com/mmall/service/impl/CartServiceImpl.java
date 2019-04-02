@@ -40,7 +40,8 @@ public class CartServiceImpl implements ICartService {
      * @param count     :商品数量
      * @return
      */
-    public ServerResponse<CartVo> add(Integer userId,Integer productId,Integer count){
+    @Override
+    public ServerResponse<CartVo> add(Integer userId, Integer productId, Integer count){
         if(productId == null || count == null)
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
 
@@ -64,7 +65,8 @@ public class CartServiceImpl implements ICartService {
         return this.list(userId);
     }
 
-    public ServerResponse<CartVo> update(Integer userId,Integer productId,Integer count){
+    @Override
+    public ServerResponse<CartVo> update(Integer userId, Integer productId, Integer count){
         if(productId == null || count == null)
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
 
@@ -76,7 +78,8 @@ public class CartServiceImpl implements ICartService {
         return this.list(userId);
     }
 
-    public  ServerResponse<CartVo> deleteProduct(Integer userId,String productIds){
+    @Override
+    public  ServerResponse<CartVo> deleteProduct(Integer userId, String productIds){
         List<String> productList = Splitter.on(",").splitToList(productIds);
         if(CollectionUtils.isEmpty(productList))
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
@@ -84,16 +87,19 @@ public class CartServiceImpl implements ICartService {
         return this.list(userId);
     }
 
+    @Override
     public  ServerResponse<CartVo> list(Integer userId){
         CartVo cartVo = this.getCartVoLimit(userId);
         return ServerResponse.createBySuccess(cartVo);
     }
 
-    public  ServerResponse<CartVo> selectOrUnSelect(Integer userId,Integer productId,Integer checked){
+    @Override
+    public  ServerResponse<CartVo> selectOrUnSelect(Integer userId, Integer productId, Integer checked){
         cartMapper.checkedOrUnCheckedProduct(userId,checked,productId);
         return this.list(userId);
     }
 
+    @Override
     public ServerResponse<Integer> getCartProductCount(Integer userId){
         if(userId == null)
             return ServerResponse.createBySuccess(0);
